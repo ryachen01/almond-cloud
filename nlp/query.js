@@ -18,6 +18,7 @@ const I18n = require('../util/i18n');
 const exampleModel = require('../model/example');
 const editDistance = require('../util/edit_distance');
 const classifier = require('./classifier.js');
+const uniqid = require('uniqid');
 
 const applyCompatibility = require('./compat');
 // thingtalk version from before we started passing it to the API
@@ -150,22 +151,13 @@ async function query(req, res) {
 
     applyCompatibility(result, thingtalk_version);
     res.set("Cache-Control", "no-store,must-revalidate");
-    classifier.classify(query).then((value) => {
+    const classifier_output = await classifier.classify(query, uniqid());
 
-      var dict = {};
-      const probabilities = value.split(" ");
-      dict["questions"] = parseFloat(probabilities[0]);
-      dict["thingtalk"] = parseFloat(probabilities[1]);
-      dict["chatty"] = parseFloat(probabilities[2]);
-      dict["other"] = parseFloat(probabilities[3]);
-
-      res.json({
-           candidates: result,
-           tokens: tokens,
-           entities: tokenized.entities,
-           intent: dict
-      });
-
+    res.json({
+         candidates: result,
+         tokens: tokens,
+         entities: tokenized.entities,
+         intent: classifier_output
     });
 
 }
@@ -198,3 +190,4 @@ router.get('/:locale/tokenize', iv.validateGET({ q: 'string' }, { json: true }),
 });
 
 module.exports = router;
+
