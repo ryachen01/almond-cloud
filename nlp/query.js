@@ -151,13 +151,12 @@ async function query(req, res) {
 
     applyCompatibility(result, thingtalk_version);
     res.set("Cache-Control", "no-store,must-revalidate");
-    const classifier_output = await classifier.classify(query, uniqid());
+    //const classifier_output = await classifier.classify(query, uniqid());
 
     res.json({
          candidates: result,
          tokens: tokens,
-         entities: tokenized.entities,
-         intent: classifier_output
+         entities: tokenized.entities
     });
 
 }
