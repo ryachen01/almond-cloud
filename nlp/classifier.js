@@ -36,13 +36,13 @@ class NLPClassifier{
 			console.log("error occured");
 		});
 		this._stream.on('end', (error) => {
-			console.log("ending process");
+			console.log("Ending Python Process");
 		});
 		this._stream.on('close', (hadError) => {
-			console.log("closing process");
+			console.log("Closing Python Process");
 			this.isLive = false;
 			for (var i = 0; i < this.concurrentRequests.length; i++){
-				this.concurrentRequests[i].reject("Promise Rejected");
+				this.concurrentRequests[i].reject("Request Rejected");
 				this.concurrentRequests.splice(i, 1);
 			}
 		});
@@ -70,7 +70,7 @@ class NLPClassifier{
 		const new_promise = this.newPromise(id);
 		this.concurrentRequests.push(new_promise);
 		if (!this.isLive){
-			new_promise.reject("Promise Rejected");
+			new_promise.reject("Python Process Dead");
 		}else{
 			this._stream.write(
 					{id: id, sentence: input }
