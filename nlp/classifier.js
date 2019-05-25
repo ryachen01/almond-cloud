@@ -2,9 +2,8 @@
 
 const spawn = require('child_process').spawn;
 const JsonDatagramSocket = require('../util/json_datagram_socket');
-const events = require('events');
 
-class NLPClassifier extends events.EventEmitter{
+class NLPClassifier{
 
 	constructor(){
 
@@ -29,8 +28,8 @@ class NLPClassifier extends events.EventEmitter{
 		});
 
 		this._stream.on('error', (e) => {
-		    
-		    this.emit('error', e);
+
+			console.log('error', e);
 		});
 
 		
@@ -56,8 +55,8 @@ class NLPClassifier extends events.EventEmitter{
 		const promise = this.newPromise(id);
 		this.concurrentRequests.push(promise);
 		this._stream.write({
-		       	id,
-		        input
+			id,
+			input
 		});
 		return this.concurrentRequests[this.concurrentRequests.length - 1].promise;
 
