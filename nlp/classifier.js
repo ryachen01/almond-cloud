@@ -1,11 +1,13 @@
 "use strict";
 
 const spawn = require('child_process').spawn;
+const events = require('events');
 const JsonDatagramSocket = require('../util/json_datagram_socket');
 
-class NLPClassifier{
+class NLPClassifier extends events.EventEmitter{
 
 	constructor(){
+		super();
 
 		this.pythonProcess = spawn('python3',['-u', "python_classifier/classifier.py"]);
 
@@ -27,9 +29,12 @@ class NLPClassifier{
 			}
 		});
 
-		this._stream.on('error', (e) => {
-
-			console.log('error', e);
+		this._stream.on('error', (err) => this.emit('error', err));
+		this._stream.on('end', () => {
+			this.emit('end');
+		});
+		this._stream.on('close', (hadError) => {
+			this.emit('close', hadError);
 		});
 
 		
